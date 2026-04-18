@@ -1,0 +1,266 @@
+// SkillCert AI — Module definitions and rubric data
+
+export const MODULES = [
+  {
+    id: 'cpr',
+    title: 'Adult CPR',
+    subtitle: 'Cardiopulmonary Resuscitation',
+    status: 'demo-ready',
+    tag: 'Demo Ready',
+    icon: '❤️',
+    duration: '15 min',
+    criteriaCount: 5,
+    attempts: 2,
+    lastScore: 60,
+    passed: false,
+    locked: false,
+    color: 'red',
+    accentColor: '#ef4444',
+    description:
+      'Demonstrate correct adult CPR technique against AHA guidelines including hand placement, compression rate, chest recoil, and rhythm consistency. The AI evaluates your 30-compression cycle frame-by-frame.',
+    keySkills: ['Hand placement', 'Arm position', 'Compression rate', 'Chest recoil', 'Rhythm consistency'],
+    referenceVideoUrl: null, // Luma Photon generated
+    estimatedTime: '15 min',
+  },
+  {
+    id: 'aed',
+    title: 'AED Use',
+    subtitle: 'Automated External Defibrillator',
+    status: 'demo-ready',
+    tag: 'Demo Ready',
+    icon: '⚡',
+    duration: '12 min',
+    criteriaCount: 4,
+    attempts: 0,
+    lastScore: null,
+    passed: false,
+    locked: true,
+    color: 'yellow',
+    accentColor: '#f59e0b',
+    description:
+      'Demonstrate correct AED pad placement, safety clearance procedures, correct CPR sequence integration, and timing requirements.',
+    keySkills: ['Pad placement', 'Clear call', 'CPR sequence', 'Timing'],
+    referenceVideoUrl: null,
+    estimatedTime: '12 min',
+  },
+  {
+    id: 'heimlich',
+    title: 'Heimlich Maneuver',
+    subtitle: 'Abdominal Thrusts',
+    status: 'planned-v2',
+    tag: 'Coming in v2',
+    icon: '🫁',
+    duration: '10 min',
+    criteriaCount: 3,
+    attempts: 0,
+    lastScore: null,
+    passed: false,
+    locked: true,
+    color: 'orange',
+    accentColor: '#f97316',
+    description:
+      'Correct technique for choking relief in adults including hand position, thrust angle and direction, and back blow technique.',
+    keySkills: ['Hand position', 'Thrust angle', 'Back blow technique'],
+    referenceVideoUrl: null,
+    estimatedTime: '10 min',
+  },
+  {
+    id: 'recovery',
+    title: 'Recovery Position',
+    subtitle: 'Unconscious Patient Care',
+    status: 'planned-v2',
+    tag: 'Coming in v2',
+    icon: '🛏️',
+    duration: '8 min',
+    criteriaCount: 4,
+    attempts: 0,
+    lastScore: null,
+    passed: false,
+    locked: true,
+    color: 'blue',
+    accentColor: '#3b82f6',
+    description:
+      'Head tilt, airway alignment, arm and leg positioning, and stability verification for unconscious patients.',
+    keySkills: ['Head tilt', 'Airway alignment', 'Arm positioning', 'Leg positioning'],
+    referenceVideoUrl: null,
+    estimatedTime: '8 min',
+  },
+  {
+    id: 'epipen',
+    title: 'EpiPen Administration',
+    subtitle: 'Epinephrine Auto-Injector',
+    status: 'planned-v2',
+    tag: 'Coming in v2',
+    icon: '💉',
+    duration: '8 min',
+    criteriaCount: 5,
+    attempts: 0,
+    lastScore: null,
+    passed: false,
+    locked: true,
+    color: 'purple',
+    accentColor: '#8b5cf6',
+    description:
+      'Correct thigh site selection, grip technique, cap removal, hold duration, and post-administration steps.',
+    keySkills: ['Site selection', 'Grip technique', 'Cap removal', 'Hold duration', 'Post-steps'],
+    referenceVideoUrl: null,
+    estimatedTime: '8 min',
+  },
+  {
+    id: 'inhaler',
+    title: 'Inhaler Technique',
+    subtitle: 'Metered-Dose Inhaler',
+    status: 'planned-v3',
+    tag: 'Coming in v3',
+    icon: '🌬️',
+    duration: '6 min',
+    criteriaCount: 6,
+    attempts: 0,
+    lastScore: null,
+    passed: false,
+    locked: true,
+    color: 'teal',
+    accentColor: '#14b8a6',
+    description:
+      'Shake, exhale, seal, actuation timing, breath-hold, and spacer device technique for metered-dose inhalers.',
+    keySkills: ['Shake', 'Exhale', 'Seal', 'Actuation timing', 'Breath-hold', 'Spacer use'],
+    referenceVideoUrl: null,
+    estimatedTime: '6 min',
+  },
+]
+
+// CPR rubric criteria (from document)
+export const CPR_RUBRIC = [
+  {
+    id: 1,
+    name: 'Hand Placement',
+    description: 'Interlocked hands, heel of hand on lower third of sternum',
+    scoring: 'Pass / Fail',
+    weight: 20,
+    type: 'pass-fail',
+  },
+  {
+    id: 2,
+    name: 'Arm Position',
+    description: 'Elbows locked straight, shoulders over patient',
+    scoring: 'Pass / Fail',
+    weight: 20,
+    type: 'pass-fail',
+  },
+  {
+    id: 3,
+    name: 'Compression Rate',
+    description: '100–120 compressions per minute',
+    scoring: '0–10 Score',
+    weight: 20,
+    type: 'scored',
+  },
+  {
+    id: 4,
+    name: 'Chest Recoil',
+    description: 'Full recoil between compressions, hands not pressing',
+    scoring: 'Pass / Partial / Fail',
+    weight: 20,
+    type: 'partial',
+  },
+  {
+    id: 5,
+    name: 'Rhythm Consistency',
+    description: 'Steady pace maintained for full 30-compression cycle',
+    scoring: 'Pass / Fail',
+    weight: 20,
+    type: 'pass-fail',
+  },
+]
+
+// AED rubric criteria
+export const AED_RUBRIC = [
+  { id: 1, name: 'Pad Placement', description: 'Correct pad positioning on chest wall', scoring: 'Pass / Fail', weight: 25, type: 'pass-fail' },
+  { id: 2, name: 'Clear Call', description: 'Audible "clear" command before shock delivery', scoring: 'Pass / Fail', weight: 25, type: 'pass-fail' },
+  { id: 3, name: 'CPR Sequence', description: 'Correct CPR sequence before and after AED', scoring: 'Pass / Fail', weight: 25, type: 'pass-fail' },
+  { id: 4, name: 'Timing', description: 'Minimal hands-off time during AED use', scoring: 'Pass / Fail', weight: 25, type: 'pass-fail' },
+]
+
+// Mock feedback result for CPR attempt
+export const MOCK_FEEDBACK = {
+  moduleId: 'cpr',
+  overallPassed: false,
+  score: 60,
+  attemptNumber: 2,
+  referenceTimestamp: '0:14',
+  totalCriteria: 5,
+  passedCriteria: 2,
+  submittedAt: '2025-04-18T14:34:21Z',
+  processingTimeMs: 19200,
+  criteriaResults: [
+    {
+      id: 1,
+      name: 'Hand Placement',
+      status: 'pass',
+      score: 100,
+      weight: 20,
+      feedback:
+        'Excellent hand placement throughout. Interlocked fingers with the heel of your hand correctly positioned on the lower third of the sternum. Consistent positioning maintained for all 30 compressions.',
+      timestamps: [],
+    },
+    {
+      id: 2,
+      name: 'Arm Position',
+      status: 'pass',
+      score: 100,
+      weight: 20,
+      feedback:
+        'Arms remain straight and locked throughout the assessment. Shoulders are correctly positioned directly over the patient, enabling effective compression depth.',
+      timestamps: [],
+    },
+    {
+      id: 3,
+      name: 'Compression Rate',
+      status: 'fail',
+      score: 62,
+      weight: 20,
+      feedback:
+        'Compression rate dropped below 100/min on multiple occasions during your assessment. Target 100–120 compressions per minute consistently throughout the full 30-compression cycle. Consider using a metronome or the song "Stayin\' Alive" (~100 BPM) as a mental guide.',
+      timestamps: [
+        { start: '0:04', end: '0:08', note: 'Rate 89/min — too slow' },
+        { start: '0:18', end: '0:24', note: 'Rate 76/min — significantly below target' },
+      ],
+    },
+    {
+      id: 4,
+      name: 'Chest Recoil',
+      status: 'partial',
+      score: 70,
+      weight: 20,
+      feedback:
+        'Partial recoil observed in the second half of the cycle. Your hands must fully lift off the chest between compressions to allow the heart to refill with blood. Incomplete recoil reduces cardiac output by up to 30%.',
+      timestamps: [
+        { start: '0:12', end: '0:15', note: 'Incomplete recoil — hands partially resting' },
+      ],
+    },
+    {
+      id: 5,
+      name: 'Rhythm Consistency',
+      status: 'fail',
+      score: 55,
+      weight: 20,
+      feedback:
+        'Rhythm becomes irregular after the 15th compression. Maintain a steady, metronome-like pace for all 30 compressions. Inconsistent rhythm reduces effective blood circulation during resuscitation.',
+      timestamps: [
+        { start: '0:20', end: '0:30', note: 'Irregular rhythm — inconsistent intervals' },
+      ],
+    },
+  ],
+}
+
+// Mock learner list for instructor view
+export const MOCK_LEARNERS = [
+  { id: 1, name: 'Sarah Chen', role: 'ICU Nurse', avatar: 'SC', email: 'sarah.chen@stmarys.org', cpr: 'In Progress', aed: 'Locked', heimlich: 'Locked', avgScore: 60, totalAttempts: 2, lastActive: '2 hours ago', certified: false, enrolled: '2025-04-01' },
+  { id: 2, name: 'Marcus Johnson', role: 'EMT', avatar: 'MJ', email: 'mjohnson@ems.org', cpr: 'Passed', aed: 'Passed', heimlich: 'In Progress', avgScore: 88, totalAttempts: 5, lastActive: '1 day ago', certified: false, enrolled: '2025-03-15' },
+  { id: 3, name: 'Priya Patel', role: 'Ward Nurse', avatar: 'PP', email: 'p.patel@stmarys.org', cpr: 'Failed', aed: 'Locked', heimlich: 'Locked', avgScore: 42, totalAttempts: 3, lastActive: '3 hours ago', certified: false, enrolled: '2025-04-02' },
+  { id: 4, name: 'David Kim', role: 'Care Worker', avatar: 'DK', email: 'dkim@carehome.org', cpr: 'In Progress', aed: 'Locked', heimlich: 'Locked', avgScore: 72, totalAttempts: 1, lastActive: '5 hours ago', certified: false, enrolled: '2025-04-10' },
+  { id: 5, name: 'Emily Torres', role: 'First Responder', avatar: 'ET', email: 'etorres@fd.gov', cpr: 'Passed', aed: 'Passed', heimlich: 'Passed', avgScore: 96, totalAttempts: 4, lastActive: 'Just now', certified: true, enrolled: '2025-03-01' },
+  { id: 6, name: 'James Wu', role: 'Nursing Student', avatar: 'JW', email: 'jwu@university.edu', cpr: 'In Progress', aed: 'Locked', heimlich: 'Locked', avgScore: 68, totalAttempts: 1, lastActive: '1 day ago', certified: false, enrolled: '2025-04-08' },
+  { id: 7, name: 'Amelia Hayes', role: 'ICU Nurse', avatar: 'AH', email: 'ahayes@hospital.org', cpr: 'Passed', aed: 'In Progress', heimlich: 'Locked', avgScore: 84, totalAttempts: 3, lastActive: '4 hours ago', certified: false, enrolled: '2025-03-20' },
+  { id: 8, name: 'Omar Malik', role: 'Paramedic', avatar: 'OM', email: 'o.malik@ems.org', cpr: 'Passed', aed: 'Passed', heimlich: 'In Progress', avgScore: 91, totalAttempts: 6, lastActive: '2 days ago', certified: false, enrolled: '2025-03-10' },
+]

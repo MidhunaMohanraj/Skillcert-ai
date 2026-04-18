@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    font-family: 'Inter', system-ui, sans-serif;
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-gray-50 text-slate-900 antialiased;
+    margin: 0;
+    padding: 0;
+  }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { @apply bg-gray-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+}
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-xl font-semibold text-white text-sm
+           bg-gradient-to-r from-blue-500 to-cyan-500
+           hover:from-blue-600 hover:to-cyan-600
+           transition-all duration-200 shadow-md hover:shadow-blue-200
+           active:scale-[0.98] cursor-pointer border-0 inline-flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-xl font-semibold text-slate-700 text-sm
+           bg-white border border-gray-200
+           hover:bg-gray-50 hover:border-gray-300
+           transition-all duration-200
+           active:scale-[0.98] cursor-pointer inline-flex items-center gap-2;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg font-medium text-slate-600 text-sm
+           hover:bg-gray-100 transition-colors duration-150
+           cursor-pointer border-0 bg-transparent inline-flex items-center gap-2;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg cursor-pointer;
+  }
+
+  /* Status badges */
+  .badge-pass {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
+           bg-emerald-100 text-emerald-700 border border-emerald-200;
+  }
+  .badge-fail {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
+           bg-red-100 text-red-700 border border-red-200;
+  }
+  .badge-partial {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
+           bg-amber-100 text-amber-700 border border-amber-200;
+  }
+  .badge-locked {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
+           bg-gray-100 text-gray-500 border border-gray-200;
+  }
+  .badge-progress {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
+           bg-blue-100 text-blue-700 border border-blue-200;
+  }
+
+  /* Timestamp pills */
+  .ts-pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-amber-50 text-amber-800 border border-amber-200
+           hover:bg-amber-500 hover:text-white hover:border-amber-500
+           transition-all duration-150 cursor-pointer;
+  }
+  .ts-pill-fail {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
+           bg-red-50 text-red-800 border border-red-200
+           hover:bg-red-500 hover:text-white hover:border-red-500
+           transition-all duration-150 cursor-pointer;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm
+           focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400
+           placeholder-gray-400 transition-colors duration-150 bg-white;
+  }
+
+  /* Section label */
+  .section-chip {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold
+           tracking-wider bg-blue-50 text-blue-700 border border-blue-100;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-500 via-cyan-500 to-violet-500
+           bg-clip-text text-transparent;
+  }
+
+  /* Upload zone */
+  .upload-zone {
+    @apply border-2 border-dashed border-gray-200 rounded-2xl
+           transition-all duration-200 cursor-pointer
+           hover:border-blue-400 hover:bg-blue-50/50;
+  }
+  .upload-zone.active {
+    @apply border-blue-500 bg-blue-50;
+  }
+
+  /* Criterion card */
+  .criterion-pass { @apply border-l-4 border-l-emerald-500; }
+  .criterion-partial { @apply border-l-4 border-l-amber-500; }
+  .criterion-fail { @apply border-l-4 border-l-red-500; }
+
+  /* Processing step */
+  .step-done { @apply opacity-100; }
+  .step-active { @apply opacity-100; }
+  .step-pending { @apply opacity-40; }
+}
+
+@layer utilities {
+  .hero-bg {
+    background: linear-gradient(135deg, #020617 0%, #0f172a 30%, #1e1b4b 60%, #0c1a3a 100%);
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+}
