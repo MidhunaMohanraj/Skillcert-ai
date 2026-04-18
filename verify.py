@@ -1,7 +1,7 @@
 import cv2
 import base64
 import json
-from groq import Groq
+from groq import Groq 
 
 GROQ_API_KEY = "your_groq_key_here"
 def extract_frames(video_path, every_n_seconds=2):
