@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillCert AI — Clinical Skills Verification Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body { margin: 0; background: #f8fafc; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes scanAnim { 0% { top: 0; } 100% { top: calc(100% - 3px); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+    @keyframes progressBar { from { width: 0; } to { width: var(--target-width, 60%); } }
+    @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+    @keyframes borderPulse { 0%, 100% { border-color: #3b82f6; } 50% { border-color: #6366f1; } }
+    .a1 { animation: fadeInUp 0.5s 0.05s ease both; }
+    .a2 { animation: fadeInUp 0.5s 0.12s ease both; }
+    .a3 { animation: fadeInUp 0.5s 0.19s ease both; }
+    .a4 { animation: fadeInUp 0.5s 0.26s ease both; }
+    .a5 { animation: fadeInUp 0.5s 0.33s ease both; }
+    .a6 { animation: fadeInUp 0.5s 0.40s ease both; }
+    .a7 { animation: fadeInUp 0.5s 0.47s ease both; }
+    .a8 { animation: fadeInUp 0.5s 0.54s ease both; }
+    .fade-in { animation: fadeIn 0.4s ease both; }
+    .spin { animation: spin 1s linear infinite; }
+    .pulse-anim { animation: pulse 2s ease-in-out infinite; }
+    .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+    .gradient-text { background: linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-bg { background: linear-gradient(135deg, #020617 0%, #0f172a 30%, #1e1b4b 60%, #0c1a3a 100%); }
+    .card-shine { background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); }
+    .glass-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); }
+    .scan-line { position: absolute; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #06b6d4, transparent); animation: scanAnim 2s linear infinite; }
+    .progress-animated { animation: progressBar 1.2s 0.5s ease both; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .step-connector::after { content: ''; position: absolute; top: 50%; right: -28px; width: 28px; height: 2px; background: linear-gradient(90deg, #3b82f6, #06b6d4); transform: translateY(-50%); }
+    .module-locked { filter: grayscale(0.4); }
+    .timestamp-pill { display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .timestamp-pill:hover { background: #f59e0b; color: white; }
+    .timestamp-pill.fail-pill { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+    .timestamp-pill.fail-pill:hover { background: #ef4444; color: white; }
+    .nav-pill { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; white-space: nowrap; }
+    .nav-pill.active { background: #3b82f6; color: white; }
+    .nav-pill:not(.active) { background: transparent; color: #64748b; }
+    .nav-pill:not(.active):hover { background: #f1f5f9; color: #1e293b; }
+    .criterion-card { border-left: 4px solid transparent; transition: all 0.2s; }
+    .criterion-card.pass { border-left-color: #10b981; }
+    .criterion-card.partial { border-left-color: #f59e0b; }
+    .criterion-card.fail { border-left-color: #ef4444; }
+    .upload-zone { border: 2px dashed #94a3b8; border-radius: 16px; transition: all 0.2s; cursor: pointer; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: #3b82f6; background: #eff6ff; }
+    .processing-step { transition: all 0.4s; }
+    .processing-step.done { opacity: 1; }
+    .processing-step.active { opacity: 1; animation: pulse 1.5s ease-in-out infinite; }
+    .processing-step.pending { opacity: 0.35; }
+    table { border-collapse: collapse; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── MOCK DATA ─────────────────────────────────────────────────────── */
+const MODULES = [
+  { id:'cpr', title:'Adult CPR', subtitle:'Cardiopulmonary Resuscitation', status:'demo-ready', icon:'❤️', duration:'15 min', criteria:5, attempts:2, lastScore:60, passed:false, tag:'Demo Ready', color:'red', description:'Demonstrate correct adult CPR technique including hand placement, compression rate, chest recoil, and rhythm consistency against AHA guidelines.' },
+  { id:'aed', title:'AED Use', subtitle:'Automated External Defibrillator', status:'demo-ready', icon:'⚡', duration:'12 min', criteria:4, attempts:0, lastScore:null, passed:false, locked:true, tag:'Demo Ready', color:'yellow', description:'Correct AED pad placement, safety clearance procedures, correct CPR sequence integration, and timing requirements.' },
+  { id:'heimlich', title:'Heimlich Maneuver', subtitle:'Abdominal Thrusts', status:'planned-v2', icon:'🫁', duration:'10 min', criteria:3, attempts:0, lastScore:null, passed:false, locked:true, tag:'Coming in v2', color:'orange', description:'Correct technique for choking relief including hand position, thrust angle and direction, and back blow technique.' },
+  { id:'recovery', title:'Recovery Position', subtitle:'Unconscious Patient Care', status:'planned-v2', icon:'🛏️', duration:'8 min', criteria:4, attempts:0, lastScore:null, passed:false, locked:true, tag:'Coming in v2', color:'blue', description:'Head tilt, airway alignment, arm and leg positioning, and stability verification for unconscious patients.' },
+  { id:'epipen', title:'EpiPen Administration', subtitle:'Epinephrine Auto-Injector', status:'planned-v2', icon:'💉', duration:'8 min', criteria:5, attempts:0, lastScore:null, passed:false, locked:true, tag:'Coming in v2', color:'purple', description:'Correct thigh site selection, grip technique, cap removal, hold duration, and post-administration steps.' },
+  { id:'inhaler', title:'Inhaler Technique', subtitle:'Metered-Dose Inhaler', status:'planned-v3', icon:'🌬️', duration:'6 min', criteria:6, attempts:0, lastScore:null, passed:false, locked:true, tag:'Coming in v3', color:'teal', description:'Shake, exhale, seal, actuation timing, breath-hold, and spacer device technique.' },
+];
+
+const FEEDBACK_RESULT = {
+  overallPassed: false,
+  score: 60,
+  attemptNumber: 2,
+  referenceTimestamp: '0:14',
+  totalCriteria: 5,
+  passedCriteria: 2,
+  criteriaResults: [
+    { id:1, name:'Hand Placement', status:'pass', score:100, weight:20, feedback:'Excellent hand placement throughout. Interlocked fingers with heel of hand correctly positioned on the lower third of the sternum.', timestamps:[] },
+    { id:2, name:'Arm Position', status:'pass', score:100, weight:20, feedback:'Arms remain straight and locked throughout the assessment. Shoulders are correctly positioned directly over the patient.', timestamps:[] },
+    { id:3, name:'Compression Rate', status:'fail', score:62, weight:20, feedback:'Compression rate dropped below 100/min on multiple occasions. Target 100–120 compressions per minute consistently throughout the cycle.', timestamps:[{start:'0:04',end:'0:08',note:'89/min'},{start:'0:18',end:'0:24',note:'76/min'}] },
+    { id:4, name:'Chest Recoil', status:'partial', score:70, weight:20, feedback:'Partial recoil observed in the second half. Hands must lift completely off the chest between compressions to allow full recoil.', timestamps:[{start:'0:12',end:'0:15',note:'Incomplete recoil'}] },
+    { id:5, name:'Rhythm Consistency', status:'fail', score:55, weight:20, feedback:'Rhythm becomes irregular after the 15th compression. Maintain a steady metronome-like pace for all 30 compressions.', timestamps:[{start:'0:20',end:'0:30',note:'Irregular rhythm'}] },
+  ],
+};
+
+const LEARNERS = [
+  { name:'Sarah Chen', role:'ICU Nurse', avatar:'SC', cpr:'Passed', aed:'In Progress', heimlich:'Locked', avgScore:92, attempts:3, lastActive:'2h ago', certified:true },
+  { name:'Marcus Johnson', role:'EMT', avatar:'MJ', cpr:'Passed', aed:'Passed', heimlich:'In Progress', avgScore:88, attempts:5, lastActive:'1d ago', certified:false },
+  { name:'Priya Patel', role:'Ward Nurse', avatar:'PP', cpr:'Failed', aed:'Locked', heimlich:'Locked', avgScore:60, attempts:2, lastActive:'3h ago', certified:false },
+  { name:'David Kim', role:'Care Worker', avatar:'DK', cpr:'In Progress', aed:'Locked', heimlich:'Locked', avgScore:72, attempts:1, lastActive:'5h ago', certified:false },
+  { name:'Emily Torres', role:'First Responder', avatar:'ET', cpr:'Passed', aed:'Passed', heimlich:'Passed', avgScore:96, attempts:4, lastActive:'Just now', certified:true },
+  { name:'James Wu', role:'Nursing Student', avatar:'JW', cpr:'In Progress', aed:'Locked', heimlich:'Locked', avgScore:68, attempts:1, lastActive:'1d ago', certified:false },
+];
+
+const SCREENS = [
+  { id:'landing', label:'🏠 Landing' },
+  { id:'auth', label:'🔐 Login' },
+  { id:'dashboard', label:'📚 Learner Dashboard' },
+  { id:'module', label:'🎬 Module: CPR' },
+  { id:'upload', label:'📤 Upload Video' },
+  { id:'processing', label:'🤖 AI Processing' },
+  { id:'feedback', label:'📊 Feedback Results' },
+  { id:'instructor', label:'👩‍💼 Instructor View' },
+];
+
+/* ─── ICONS ──────────────────────────────────────────────────────────── */
+const Ico = {
+  Check: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  CheckCircle: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 12 15 15 9"/></svg>,
+  XCircle: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
+  AlertCircle: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill={c}/></svg>,
+  Play: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c}><polygon points="5 3 19 12 5 21"/></svg>,
+  Upload: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
+  Video: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><polygon points="23 7 16 12 23 17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>,
+  Clock: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+  User: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  Grid: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+  ChevronRight: ({s=16,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>,
+  Star: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c} stroke={c} strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>,
+  Brain: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg>,
+  Shield: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+  Award: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>,
+  ArrowRight: ({s=16,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+  Refresh: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
+  Zap: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill={c} stroke={c} strokeWidth="1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>,
+  BarChart: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>,
+  Download: ({s=20,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
+  Lock: ({s=16,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+  Eye: ({s=18,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+  LogOut: ({s=18,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+  Search: ({s=18,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  Plus: ({s=18,c='currentColor'}) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+};
+
+/* ─── SMALL HELPERS ──────────────────────────────────────────────────── */
+const StatusBadge = ({ status, size='sm' }) => {
+  const map = {
+    'pass': ['bg-emerald-100 text-emerald-700 border border-emerald-200', '✓ Pass'],
+    'partial': ['bg-amber-100 text-amber-700 border border-amber-200', '⚠ Partial'],
+    'fail': ['bg-red-100 text-red-700 border border-red-200', '✗ Fail'],
+    'Passed': ['bg-emerald-100 text-emerald-700 border border-emerald-200', '✓ Passed'],
+    'Failed': ['bg-red-100 text-red-700 border border-red-200', '✗ Failed'],
+    'In Progress': ['bg-blue-100 text-blue-700 border border-blue-200', '▷ In Progress'],
+    'Locked': ['bg-gray-100 text-gray-500 border border-gray-200', '🔒 Locked'],
+  };
+  const [cls, label] = map[status] || ['bg-gray-100 text-gray-600', status];
+  const p = size === 'sm' ? 'px-2.5 py-0.5 text-xs' : 'px-3 py-1 text-sm';
+  return <span className={`inline-flex items-center gap-1 font-medium rounded-full ${p} ${cls}`}>{label}</span>;
+};
+
+const ScoreRing = ({ score, size=120 }) => {
+  const r = 46; const c = 2 * Math.PI * r;
+  const off = c - (score / 100) * c;
+  const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
+  return (
+    <div style={{width:size,height:size,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <svg width={size} height={size} style={{transform:'rotate(-90deg)',position:'absolute'}}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e2e8f0" strokeWidth="8"/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="8"
+          strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
+          style={{transition:'stroke-dashoffset 1.5s ease'}}/>
+      </svg>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontSize:size*0.22,fontWeight:800,color}}>{score}%</div>
+        <div style={{fontSize:size*0.1,color:'#94a3b8',fontWeight:500,marginTop:2}}>SCORE</div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── NAVBAR ─────────────────────────────────────────────────────────── */
+const Navbar = ({ screen, setScreen, userType }) => {
+  const isAuth = ['dashboard','module','upload','processing','feedback','instructor'].includes(screen);
+  return (
+    <nav style={{background:'#0f172a',borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
+      <div style={{maxWidth:1280,margin:'0 auto',padding:'0 24px',height:64,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',alignItems:'center',gap:12,cursor:'pointer'}} onClick={()=>setScreen('landing')}>
+          <div style={{width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,#3b82f6,#06b6d4)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <span style={{fontSize:18}}>🏥</span>
+          </div>
+          <div>
+            <div style={{color:'white',fontWeight:800,fontSize:16,letterSpacing:'-0.3px'}}>SkillCert<span style={{color:'#06b6d4'}}>AI</span></div>
+            <div style={{color:'#64748b',fontSize:10,letterSpacing:'1.5px',fontWeight:600}}>CLINICAL VERIFICATION</div>
+          </div>
+        </div>
+        {isAuth ? (
+          <div style={{display:'flex',alignItems:'center',gap:16}}>
+            {userType === 'instructor' ? (
+              <button onClick={()=>setScreen('instructor')} style={{background:'none',border:'none',color:'#94a3b8',cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontSize:14,fontWeight:500}}>
+                <Ico.BarChart s={16} c="#94a3b8"/>Dashboard
+              </button>
+            ) : (
+              <button onClick={()=>setScreen('dashboard')} style={{background:'none',border:'none',color:'#94a3b8',cursor:'pointer',display:'flex',alignItems:'center',gap:6,fontSize:14,fontWeight:500}}>
+                <Ico.Grid s={16} c="#94a3b8"/>My Modules
+              </button>
+            )}
+            <div style={{width:1,height:20,background:'rgba(255,255,255,0.1)'}}/>
+            <div style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+              <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#3b82f6,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:12,fontWeight:700}}>
+                {userType==='instructor'?'DR':'SC'}
+              </div>
+              <span style={{color:'#e2e8f0',fontSize:14,fontWeight:500}}>{userType==='instructor'?'Dr. Rivera':'Sarah Chen'}</span>
+            </div>
+            <button onClick={()=>setScreen('landing')} style={{background:'none',border:'none',color:'#64748b',cursor:'pointer',display:'flex',alignItems:'center'}}>
+              <Ico.LogOut s={18} c="#64748b"/>
+            </button>
+          </div>
+        ) : (
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <button onClick={()=>setScreen('auth')} style={{background:'none',border:'1px solid rgba(255,255,255,0.15)',color:'white',borderRadius:8,padding:'8px 18px',fontSize:14,fontWeight:500,cursor:'pointer'}}>Log In</button>
+            <button onClick={()=>setScreen('auth')} style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:8,padding:'8px 18px',fontSize:14,fontWeight:600,cursor:'pointer'}}>Get Started</button>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+/* ─── DEMO NAVIGATOR ─────────────────────────────────────────────────── */
+const DemoNav = ({ screen, setScreen }) => {
+  const [open, setOpen] = useState(true);
+  return (
+    <div style={{background:'#1e293b',borderBottom:'1px solid rgba(255,255,255,0.06)',padding:'0 24px'}}>
+      <div style={{maxWidth:1280,margin:'0 auto',display:'flex',alignItems:'center',gap:8,padding:'8px 0',overflowX:'auto'}}>
+        <span style={{color:'#475569',fontSize:11,fontWeight:700,letterSpacing:'1px',whiteSpace:'nowrap',marginRight:4}}>PREVIEW SCREENS:</span>
+        {SCREENS.map(s => (
+          <button key={s.id} className="nav-pill" style={screen===s.id?{background:'#3b82f6',color:'white'}:{color:'#94a3b8'}}
+            onClick={()=>setScreen(s.id)}>{s.label}</button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─── LANDING PAGE ───────────────────────────────────────────────────── */
+const LandingPage = ({ setScreen }) => {
+  const steps = [
+    { icon:'🎬', title:'Watch', desc:'AI-generated reference video with annotated technique overlays', color:'#3b82f6' },
+    { icon:'📱', title:'Record', desc:'Film yourself on any smartphone or webcam', color:'#8b5cf6' },
+    { icon:'⬆️', title:'Upload', desc:'Instantly upload to secure cloud storage', color:'#06b6d4' },
+    { icon:'🤖', title:'Verify', desc:'Claude Vision scores each rubric criterion frame-by-frame', color:'#10b981' },
+    { icon:'📊', title:'Feedback', desc:'Timestamped, criterion-level results with specific guidance', color:'#f59e0b' },
+    { icon:'🎓', title:'Certify', desc:'Unlock the next module and earn your verified certificate', color:'#ef4444' },
+  ];
+  const stats = [
+    { value:'350K+', label:'Cardiac arrests outside hospitals annually in the US', color:'#ef4444' },
+    { value:'70–80%', label:'Of certified individuals perform CPR below AHA guidelines', color:'#f59e0b' },
+    { value:'$8B+', label:'Compliance training market — ripe for AI disruption', color:'#3b82f6' },
+  ];
+  return (
+    <div style={{overflowX:'hidden'}}>
+      {/* HERO */}
+      <section className="hero-bg" style={{minHeight:'92vh',display:'flex',flexDirection:'column',justifyContent:'center',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',inset:0,backgroundImage:'radial-gradient(circle at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(139,92,246,0.1) 0%, transparent 60%)',pointerEvents:'none'}}/>
+        {/* Grid pattern */}
+        <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',backgroundSize:'60px 60px',pointerEvents:'none'}}/>
+        <div style={{maxWidth:1280,margin:'0 auto',padding:'80px 24px 100px',textAlign:'center'}}>
+          <div className="a1" style={{display:'inline-flex',alignItems:'center',gap:8,background:'rgba(59,130,246,0.15)',border:'1px solid rgba(59,130,246,0.3)',borderRadius:999,padding:'6px 16px',marginBottom:28}}>
+            <span style={{fontSize:12,color:'#93c5fd',fontWeight:600,letterSpacing:'1px'}}>🏆 HACKATHON TRACK 1 · AI VIDEO AGENTS FOR VERTICAL INDUSTRIES</span>
+          </div>
+          <h1 className="a2" style={{fontSize:'clamp(36px,6vw,72px)',fontWeight:900,color:'white',lineHeight:1.1,letterSpacing:'-2px',margin:'0 0 24px'}}>
+            Clinical Skills Verification<br/><span className="gradient-text">Powered by AI Vision</span>
+          </h1>
+          <p className="a3" style={{fontSize:'clamp(16px,2vw,20px)',color:'#94a3b8',maxWidth:640,margin:'0 auto 40px',lineHeight:1.7,fontWeight:400}}>
+            Watch the reference. Record your technique. Get AI-scored, timestamped feedback against clinical rubrics. Pass every criterion before you certify.
+          </p>
+          <div className="a4" style={{display:'flex',gap:14,justifyContent:'center',flexWrap:'wrap'}}>
+            <button onClick={()=>setScreen('auth')} style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:12,padding:'14px 32px',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 32px rgba(59,130,246,0.4)'}}>
+              Start Certification →
+            </button>
+            <button onClick={()=>setScreen('module')} style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',color:'white',borderRadius:12,padding:'14px 32px',fontSize:16,fontWeight:600,cursor:'pointer',backdropFilter:'blur(8px)'}}>
+              ▷ View Demo Module
+            </button>
+          </div>
+          {/* Partner tags */}
+          <div className="a5" style={{display:'flex',alignItems:'center',gap:16,justifyContent:'center',marginTop:56,flexWrap:'wrap'}}>
+            <span style={{color:'#475569',fontSize:12,fontWeight:500}}>Powered by</span>
+            {['Luma Photon','Butterbase','Cumulus Labs','Claude Vision'].map(p=>(
+              <span key={p} style={{background:'rgba(255,255,255,0.07)',border:'1px solid rgba(255,255,255,0.12)',color:'#cbd5e1',borderRadius:8,padding:'5px 14px',fontSize:13,fontWeight:600}}>{p}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section style={{background:'white',padding:'64px 24px',borderBottom:'1px solid #f1f5f9'}}>
+        <div style={{maxWidth:1280,margin:'0 auto'}}>
+          <div style={{textAlign:'center',marginBottom:48}}>
+            <h2 style={{fontSize:32,fontWeight:800,color:'#0f172a',letterSpacing:'-1px',margin:'0 0 12px'}}>The stakes are real</h2>
+            <p style={{color:'#64748b',fontSize:16,maxWidth:480,margin:'0 auto'}}>Healthcare certification hasn't changed in decades. SkillCert AI changes that.</p>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:24}}>
+            {stats.map((s,i)=>(
+              <div key={i} className="hover-lift" style={{background:'#f8fafc',borderRadius:16,padding:28,border:'1px solid #f1f5f9',textAlign:'center'}}>
+                <div style={{fontSize:48,fontWeight:900,color:s.color,letterSpacing:'-2px',lineHeight:1}}>{s.value}</div>
+                <p style={{color:'#64748b',marginTop:12,fontSize:14,lineHeight:1.6,margin:'12px 0 0'}}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={{background:'#f8fafc',padding:'80px 24px'}}>
+        <div style={{maxWidth:1280,margin:'0 auto'}}>
+          <div style={{textAlign:'center',marginBottom:56}}>
+            <span style={{background:'#eff6ff',color:'#3b82f6',borderRadius:999,padding:'4px 14px',fontSize:13,fontWeight:700,letterSpacing:'0.5px'}}>THE CORE LOOP</span>
+            <h2 style={{fontSize:36,fontWeight:800,color:'#0f172a',letterSpacing:'-1.5px',margin:'16px 0 12px'}}>Six steps to verified competency</h2>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:16}}>
+            {steps.map((s,i)=>(
+              <div key={i} className="hover-lift" style={{background:'white',borderRadius:16,padding:'28px 20px',border:'1px solid #f1f5f9',textAlign:'center',position:'relative'}}>
+                <div style={{width:56,height:56,borderRadius:16,background:`${s.color}18`,margin:'0 auto 16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:26}}>{s.icon}</div>
+                <div style={{fontSize:11,fontWeight:700,color:'#94a3b8',letterSpacing:'1.5px',marginBottom:8}}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{fontSize:18,fontWeight:800,color:'#0f172a',marginBottom:8}}>{s.title}</div>
+                <p style={{fontSize:13,color:'#64748b',lineHeight:1.6,margin:0}}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MODULES */}
+      <section style={{background:'white',padding:'80px 24px'}}>
+        <div style={{maxWidth:1280,margin:'0 auto'}}>
+          <div style={{textAlign:'center',marginBottom:48}}>
+            <h2 style={{fontSize:36,fontWeight:800,color:'#0f172a',letterSpacing:'-1.5px',margin:'0 0 12px'}}>Skill module library</h2>
+            <p style={{color:'#64748b',fontSize:16}}>AI-scored rubrics for every critical care skill</p>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:20}}>
+            {MODULES.slice(0,6).map((m,i)=>{
+              const tagColors = {'demo-ready':'#dcfce7 #15803d','planned-v2':'#eff6ff #1d4ed8','planned-v3':'#f5f3ff #7c3aed'};
+              const [bg,tc] = (tagColors[m.status]||'#f1f5f9 #64748b').split(' ');
+              return (
+                <div key={m.id} className="hover-lift" style={{background:'#f8fafc',borderRadius:16,padding:24,border:'1px solid #f1f5f9',cursor:'pointer',opacity:m.locked?0.7:1}}
+                  onClick={()=>{ if(!m.locked) setScreen('module'); }}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+                    <div style={{width:48,height:48,borderRadius:14,background:'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,boxShadow:'0 2px 8px rgba(0,0,0,0.06)'}}>{m.icon}</div>
+                    <span style={{background:bg,color:tc,borderRadius:999,padding:'3px 10px',fontSize:11,fontWeight:700}}>{m.tag}</span>
+                  </div>
+                  <div style={{fontWeight:800,color:'#0f172a',fontSize:16,marginBottom:4}}>{m.title}</div>
+                  <div style={{color:'#64748b',fontSize:13,marginBottom:12}}>{m.subtitle}</div>
+                  <div style={{display:'flex',gap:12}}>
+                    <span style={{color:'#94a3b8',fontSize:12}}><Ico.Clock s={12} c="#94a3b8"/> {m.duration}</span>
+                    <span style={{color:'#94a3b8',fontSize:12}}>✓ {m.criteria} criteria</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{background:'linear-gradient(135deg,#0f172a,#1e1b4b)',padding:'80px 24px',textAlign:'center'}}>
+        <div style={{maxWidth:600,margin:'0 auto'}}>
+          <h2 style={{fontSize:40,fontWeight:900,color:'white',letterSpacing:'-1.5px',margin:'0 0 16px'}}>Better than any recertification session</h2>
+          <p style={{color:'#94a3b8',fontSize:18,lineHeight:1.7,margin:'0 0 36px'}}>See exactly which second your compression rate dropped and what you need to fix — in 20 seconds flat.</p>
+          <button onClick={()=>setScreen('auth')} style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:12,padding:'16px 40px',fontSize:17,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 32px rgba(59,130,246,0.4)'}}>
+            Start Free Certification →
+          </button>
+          <p style={{color:'#475569',fontSize:13,marginTop:16}}>Built with Luma Photon · Butterbase · Cumulus Labs · Claude Vision</p>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+/* ─── AUTH PAGE ──────────────────────────────────────────────────────── */
+const AuthPage = ({ setScreen, setUserType }) => {
+  const [tab, setTab] = useState('login');
+  const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
+  const handleLogin = (type) => { setUserType(type); setScreen(type==='instructor'?'instructor':'dashboard'); };
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'linear-gradient(135deg,#f8fafc,#eff6ff)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div className="a1" style={{width:'100%',maxWidth:420}}>
+        <div style={{textAlign:'center',marginBottom:32}}>
+          <div style={{width:56,height:56,borderRadius:16,background:'linear-gradient(135deg,#3b82f6,#06b6d4)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px',fontSize:26}}>🏥</div>
+          <h1 style={{fontWeight:900,fontSize:26,color:'#0f172a',letterSpacing:'-0.5px',margin:'0 0 6px'}}>SkillCert<span style={{color:'#3b82f6'}}>AI</span></h1>
+          <p style={{color:'#64748b',fontSize:14}}>Clinical skills verification platform</p>
+        </div>
+        <div style={{background:'white',borderRadius:20,padding:'32px 28px',boxShadow:'0 4px 24px rgba(0,0,0,0.08)',border:'1px solid #f1f5f9'}}>
+          {/* Tabs */}
+          <div style={{display:'flex',background:'#f8fafc',borderRadius:10,padding:3,marginBottom:24}}>
+            {['login','register'].map(t=>(
+              <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:'9px 0',borderRadius:8,border:'none',fontWeight:600,fontSize:14,cursor:'pointer',background:tab===t?'white':'transparent',color:tab===t?'#0f172a':'#64748b',boxShadow:tab===t?'0 1px 4px rgba(0,0,0,0.1)':'none',transition:'all 0.2s'}}>
+                {t==='login'?'Sign In':'Create Account'}
+              </button>
+            ))}
+          </div>
+          {/* Fields */}
+          {tab==='register' && (
+            <div style={{marginBottom:16}}>
+              <label style={{fontSize:13,fontWeight:600,color:'#374151',display:'block',marginBottom:6}}>Full Name</label>
+              <input placeholder="Sarah Chen" style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid #e2e8f0',fontSize:14,outline:'none',boxSizing:'border-box'}}/>
+            </div>
+          )}
+          <div style={{marginBottom:16}}>
+            <label style={{fontSize:13,fontWeight:600,color:'#374151',display:'block',marginBottom:6}}>Email Address</label>
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@hospital.org" style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid #e2e8f0',fontSize:14,outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          {tab==='register' && (
+            <div style={{marginBottom:16}}>
+              <label style={{fontSize:13,fontWeight:600,color:'#374151',display:'block',marginBottom:6}}>Role</label>
+              <select style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid #e2e8f0',fontSize:14,outline:'none',boxSizing:'border-box',background:'white'}}>
+                {['ICU Nurse','Ward Nurse','EMT / Paramedic','Care Worker','First Responder','Nursing Student','Other'].map(r=><option key={r}>{r}</option>)}
+              </select>
+            </div>
+          )}
+          <div style={{marginBottom:24}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+              <label style={{fontSize:13,fontWeight:600,color:'#374151'}}>Password</label>
+              {tab==='login' && <a href="#" style={{color:'#3b82f6',fontSize:12,fontWeight:500}}>Forgot password?</a>}
+            </div>
+            <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="••••••••" style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid #e2e8f0',fontSize:14,outline:'none',boxSizing:'border-box'}}/>
+          </div>
+          <button onClick={()=>handleLogin('learner')} style={{width:'100%',padding:'12px',borderRadius:10,border:'none',background:'linear-gradient(135deg,#3b82f6,#06b6d4)',color:'white',fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:14}}>
+            {tab==='login'?'Sign In':'Create Account'} →
+          </button>
+          <div style={{position:'relative',marginBottom:14,textAlign:'center'}}>
+            <div style={{position:'absolute',top:'50%',left:0,right:0,height:1,background:'#f1f5f9'}}/>
+            <span style={{background:'white',padding:'0 12px',color:'#94a3b8',fontSize:12,fontWeight:500,position:'relative'}}>or continue as</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <button onClick={()=>handleLogin('learner')} style={{padding:'10px',borderRadius:10,border:'1px solid #e2e8f0',background:'white',fontSize:13,fontWeight:600,cursor:'pointer',color:'#374151'}}>👩‍⚕️ Demo Learner</button>
+            <button onClick={()=>handleLogin('instructor')} style={{padding:'10px',borderRadius:10,border:'1px solid #e2e8f0',background:'white',fontSize:13,fontWeight:600,cursor:'pointer',color:'#374151'}}>👩‍💼 Demo Instructor</button>
+          </div>
+        </div>
+        <p style={{textAlign:'center',color:'#94a3b8',fontSize:12,marginTop:20}}>Secure login · HIPAA-compliant infrastructure</p>
+      </div>
+    </div>
+  );
+};
+
+/* ─── LEARNER DASHBOARD ──────────────────────────────────────────────── */
+const LearnerDashboard = ({ setScreen }) => {
+  const progressMods = MODULES.filter(m=>!m.locked||m.attempts>0);
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'#f8fafc',padding:'32px 24px'}}>
+      <div style={{maxWidth:1280,margin:'0 auto'}}>
+        {/* Header */}
+        <div className="a1" style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:32,flexWrap:'wrap',gap:16}}>
+          <div>
+            <h1 style={{fontSize:28,fontWeight:900,color:'#0f172a',margin:'0 0 6px',letterSpacing:'-0.5px'}}>Welcome back, Sarah 👋</h1>
+            <p style={{color:'#64748b',fontSize:15,margin:0}}>ICU Nurse · St. Mary's Medical Center</p>
+          </div>
+          <div style={{display:'flex',gap:10}}>
+            <div style={{background:'white',borderRadius:12,padding:'12px 20px',border:'1px solid #f1f5f9',textAlign:'center'}}>
+              <div style={{fontSize:22,fontWeight:800,color:'#10b981'}}>0/6</div>
+              <div style={{fontSize:11,color:'#94a3b8',fontWeight:600,marginTop:2}}>MODULES CERTIFIED</div>
+            </div>
+            <div style={{background:'white',borderRadius:12,padding:'12px 20px',border:'1px solid #f1f5f9',textAlign:'center'}}>
+              <div style={{fontSize:22,fontWeight:800,color:'#3b82f6'}}>2</div>
+              <div style={{fontSize:11,color:'#94a3b8',fontWeight:600,marginTop:2}}>ATTEMPTS MADE</div>
+            </div>
+            <div style={{background:'white',borderRadius:12,padding:'12px 20px',border:'1px solid #f1f5f9',textAlign:'center'}}>
+              <div style={{fontSize:22,fontWeight:800,color:'#f59e0b'}}>60%</div>
+              <div style={{fontSize:11,color:'#94a3b8',fontWeight:600,marginTop:2}}>BEST SCORE</div>
+            </div>
+          </div>
+        </div>
+
+        {/* CPR - Active Module Banner */}
+        <div className="a2" style={{background:'linear-gradient(135deg,#1e3a5f,#1e40af)',borderRadius:16,padding:'24px 28px',marginBottom:28,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:16}}>
+          <div style={{display:'flex',gap:16,alignItems:'center'}}>
+            <div style={{width:56,height:56,borderRadius:16,background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>❤️</div>
+            <div>
+              <div style={{color:'#bfdbfe',fontSize:12,fontWeight:600,letterSpacing:'1px',marginBottom:4}}>CURRENT MODULE</div>
+              <div style={{color:'white',fontSize:20,fontWeight:800}}>Adult CPR</div>
+              <div style={{color:'#93c5fd',fontSize:13,marginTop:2}}>Attempt 2 · Last score: 60% · 3/5 criteria passed</div>
+            </div>
+          </div>
+          <div style={{display:'flex',gap:10}}>
+            <button onClick={()=>setScreen('module')} style={{background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.2)',color:'white',borderRadius:10,padding:'10px 20px',fontSize:14,fontWeight:600,cursor:'pointer'}}>
+              ▷ Watch Reference
+            </button>
+            <button onClick={()=>setScreen('upload')} style={{background:'white',border:'none',color:'#1e40af',borderRadius:10,padding:'10px 20px',fontSize:14,fontWeight:700,cursor:'pointer'}}>
+              Upload New Attempt →
+            </button>
+          </div>
+        </div>
+
+        {/* Module Grid */}
+        <div className="a3" style={{marginBottom:12}}>
+          <h2 style={{fontSize:18,fontWeight:800,color:'#0f172a',margin:'0 0 16px',letterSpacing:'-0.3px'}}>All Skill Modules</h2>
+        </div>
+        <div className="a3" style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(310px,1fr))',gap:18}}>
+          {MODULES.map((m,i)=>{
+            const statusLabel = m.id==='cpr'?'In Progress':m.locked?'Locked':'Not Started';
+            const statusColor = m.id==='cpr'?'#3b82f6':m.locked?'#94a3b8':'#94a3b8';
+            const tagBgs = {'demo-ready':'#dcfce7','planned-v2':'#eff6ff','planned-v3':'#f5f3ff'};
+            const tagTxts = {'demo-ready':'#15803d','planned-v2':'#1d4ed8','planned-v3':'#7c3aed'};
+            return (
+              <div key={m.id} className="hover-lift" onClick={()=>{if(!m.locked||m.id==='cpr') setScreen('module');}}
+                style={{background:'white',borderRadius:16,padding:22,border:`1px solid ${m.id==='cpr'?'#bfdbfe':'#f1f5f9'}`,cursor:m.locked&&m.id!=='cpr'?'default':'pointer',opacity:m.locked&&m.id!=='cpr'?0.65:1,boxShadow:m.id==='cpr'?'0 2px 12px rgba(59,130,246,0.12)':'none'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
+                  <div style={{display:'flex',gap:12,alignItems:'center'}}>
+                    <div style={{width:44,height:44,borderRadius:12,background:'#f8fafc',display:'flex',alignItems:'center',justifyContent:'center',fontSize:22}}>{m.icon}</div>
+                    <div>
+                      <div style={{fontWeight:800,color:'#0f172a',fontSize:15}}>{m.title}</div>
+                      <div style={{color:'#94a3b8',fontSize:12,marginTop:2}}>{m.subtitle}</div>
+                    </div>
+                  </div>
+                  {m.locked && m.id!=='cpr' && <Ico.Lock s={15} c="#cbd5e1"/>}
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+                  <span style={{background:tagBgs[m.status],color:tagTxts[m.status],borderRadius:999,padding:'3px 10px',fontSize:11,fontWeight:700}}>{m.tag}</span>
+                  <span style={{color:statusColor,fontSize:13,fontWeight:600}}>{statusLabel}</span>
+                </div>
+                {m.id==='cpr' && (
+                  <div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                      <span style={{fontSize:12,color:'#64748b'}}>Progress</span>
+                      <span style={{fontSize:12,fontWeight:700,color:'#3b82f6'}}>60%</span>
+                    </div>
+                    <div style={{background:'#f1f5f9',borderRadius:999,height:6,overflow:'hidden'}}>
+                      <div style={{width:'60%',height:'100%',background:'linear-gradient(90deg,#3b82f6,#06b6d4)',borderRadius:999,transition:'width 1s ease'}}/>
+                    </div>
+                    <div style={{display:'flex',gap:6,marginTop:10}}>
+                      {[1,2,3,4,5].map(n=>(
+                        <div key={n} style={{flex:1,height:4,borderRadius:999,background:n<=2?'#10b981':n===3?'#f59e0b':'#fee2e2'}}/>
+                      ))}
+                    </div>
+                    <div style={{fontSize:11,color:'#94a3b8',marginTop:6}}>2 passed · 1 partial · 2 failed</div>
+                  </div>
+                )}
+                {!m.locked && m.id!=='cpr' && (
+                  <div style={{fontSize:12,color:'#94a3b8'}}>Not started · {m.criteria} criteria to verify</div>
+                )}
+                {m.locked && m.id!=='cpr' && (
+                  <div style={{fontSize:12,color:'#94a3b8'}}>{m.locked&&m.id!=='cpr'?'Complete previous modules first':'Ready to attempt'}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── MODULE PAGE ────────────────────────────────────────────────────── */
+const ModulePage = ({ setScreen }) => {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'#f8fafc'}}>
+      {/* Hero */}
+      <div style={{background:'linear-gradient(135deg,#0f172a,#1e1b4b)',padding:'32px 24px'}}>
+        <div style={{maxWidth:1280,margin:'0 auto'}}>
+          <button onClick={()=>setScreen('dashboard')} style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',color:'#94a3b8',borderRadius:8,padding:'6px 14px',fontSize:13,fontWeight:500,cursor:'pointer',marginBottom:20}}>← Back</button>
+          <div style={{display:'flex',gap:16,alignItems:'center',marginBottom:8}}>
+            <span style={{fontSize:36}}>❤️</span>
+            <div>
+              <div style={{color:'#bfdbfe',fontSize:12,fontWeight:700,letterSpacing:'1.5px',marginBottom:4}}>MODULE 01 · DEMO READY</div>
+              <h1 style={{color:'white',fontSize:30,fontWeight:900,margin:0,letterSpacing:'-0.5px'}}>Adult CPR</h1>
+              <p style={{color:'#94a3b8',fontSize:14,margin:'4px 0 0'}}>Cardiopulmonary Resuscitation · AHA Guidelines</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{maxWidth:1280,margin:'0 auto',padding:'32px 24px',display:'grid',gridTemplateColumns:'1fr 380px',gap:28,alignItems:'start'}}>
+        {/* Left */}
+        <div>
+          {/* Video Player */}
+          <div className="a1" style={{background:'#0f172a',borderRadius:20,overflow:'hidden',marginBottom:24,boxShadow:'0 8px 32px rgba(0,0,0,0.2)',position:'relative'}}>
+            <div style={{position:'relative',paddingBottom:'56.25%',cursor:'pointer'}} onClick={()=>setPlaying(!playing)}>
+              <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,#0c1a3a,#1a1040)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                {/* Simulated video frame */}
+                <div style={{position:'absolute',inset:0,backgroundImage:'radial-gradient(circle at 50% 60%, rgba(59,130,246,0.06) 0%, transparent 70%)'}}/>
+                {/* Annotated frame elements */}
+                <div style={{position:'absolute',bottom:'30%',left:'50%',transform:'translateX(-50%)',border:'2px solid rgba(59,130,246,0.6)',borderRadius:8,padding:'4px 8px',color:'rgba(59,130,246,0.9)',fontSize:11,fontWeight:600,whiteSpace:'nowrap',backdropFilter:'blur(4px)'}}>Hand placement</div>
+                <div style={{position:'absolute',top:'20%',right:'20%',border:'2px solid rgba(16,185,129,0.6)',borderRadius:8,padding:'4px 8px',color:'rgba(16,185,129,0.9)',fontSize:11,fontWeight:600,whiteSpace:'nowrap'}}>Arm position ✓</div>
+                <div style={{position:'absolute',top:'30%',left:'15%',color:'#06b6d4',fontSize:11,fontWeight:600,border:'1px solid rgba(6,182,212,0.4)',borderRadius:6,padding:'3px 8px'}}>Rate: 112/min</div>
+                {/* Manikin silhouette */}
+                <div style={{width:200,height:300,borderRadius:100,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.07)'}}/>
+                {!playing && (
+                  <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
+                    <div className="pulse-anim" style={{width:72,height:72,borderRadius:'50%',background:'rgba(255,255,255,0.12)',backdropFilter:'blur(8px)',border:'2px solid rgba(255,255,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <Ico.Play s={28} c="white"/>
+                    </div>
+                    <span style={{color:'rgba(255,255,255,0.7)',fontSize:14,fontWeight:500}}>AI-Generated Reference Video</span>
+                    <span style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>Luma Photon · Annotated technique walkthrough</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Video controls */}
+            <div style={{background:'#111827',padding:'12px 18px',display:'flex',alignItems:'center',gap:14}}>
+              <button onClick={()=>setPlaying(!playing)} style={{background:'none',border:'none',cursor:'pointer',color:'white',display:'flex'}}>
+                {playing?<span style={{fontSize:16}}>⏸</span>:<Ico.Play s={16} c="white"/>}
+              </button>
+              <div style={{flex:1,height:4,background:'rgba(255,255,255,0.1)',borderRadius:999,cursor:'pointer',position:'relative'}}>
+                <div style={{width:'35%',height:'100%',background:'linear-gradient(90deg,#3b82f6,#06b6d4)',borderRadius:999}}/>
+                <div style={{position:'absolute',top:'50%',left:'35%',width:12,height:12,borderRadius:'50%',background:'white',transform:'translateY(-50%) translateX(-50%)',boxShadow:'0 2px 8px rgba(0,0,0,0.3)'}}/>
+              </div>
+              <span style={{color:'#94a3b8',fontSize:12,fontWeight:500}}>0:14 / 2:34</span>
+              <span style={{color:'#475569',fontSize:11,background:'rgba(255,255,255,0.05)',padding:'2px 8px',borderRadius:4}}>HD</span>
+            </div>
+          </div>
+
+          {/* Module description */}
+          <div className="a2" style={{background:'white',borderRadius:16,padding:24,border:'1px solid #f1f5f9',marginBottom:20}}>
+            <h3 style={{fontWeight:800,color:'#0f172a',fontSize:16,margin:'0 0 10px'}}>About this module</h3>
+            <p style={{color:'#64748b',fontSize:14,lineHeight:1.7,margin:'0 0 16px'}}>
+              This module verifies your Adult CPR technique against AHA (American Heart Association) guidelines. The AI scoring system analyzes five independent criteria across your full 30-compression cycle using Claude Vision on GPU-accelerated inference.
+            </p>
+            <div style={{display:'flex',gap:20,flexWrap:'wrap'}}>
+              {[['⏱ Duration','15 minutes'],['✓ Criteria','5 criteria scored'],['🎯 Passing','All 5 must pass'],['🔄 Attempts','Unlimited retries']].map(([l,v])=>(
+                <div key={l} style={{fontSize:13}}>
+                  <span style={{color:'#94a3b8'}}>{l}: </span>
+                  <span style={{color:'#374151',fontWeight:600}}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Rubric */}
+        <div>
+          <div className="a2" style={{background:'white',borderRadius:16,border:'1px solid #f1f5f9',overflow:'hidden'}}>
+            <div style={{padding:'18px 20px',borderBottom:'1px solid #f8fafc',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <h3 style={{fontWeight:800,color:'#0f172a',fontSize:15,margin:0}}>Scoring Rubric</h3>
+              <span style={{color:'#64748b',fontSize:12}}>Each criterion: 20% weight</span>
+            </div>
+            {[
+              { name:'Hand Placement', desc:'Interlocked hands, heel on lower third of sternum', type:'Pass / Fail' },
+              { name:'Arm Position', desc:'Elbows locked straight, shoulders over patient', type:'Pass / Fail' },
+              { name:'Compression Rate', desc:'100–120 compressions per minute', type:'0–10 Score' },
+              { name:'Chest Recoil', desc:'Full recoil, hands not resting on chest', type:'Pass / Partial / Fail' },
+              { name:'Rhythm Consistency', desc:'Steady pace for full 30-compression cycle', type:'Pass / Fail' },
+            ].map((r,i)=>(
+              <div key={i} style={{padding:'14px 20px',borderBottom:i<4?'1px solid #f8fafc':'none',display:'flex',gap:12,alignItems:'flex-start'}}>
+                <div style={{width:26,height:26,borderRadius:8,background:'#f8fafc',border:'1px solid #f1f5f9',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#64748b',flexShrink:0,marginTop:2}}>{i+1}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,color:'#0f172a',fontSize:13,marginBottom:3}}>{r.name}</div>
+                  <div style={{color:'#94a3b8',fontSize:12,marginBottom:4,lineHeight:1.5}}>{r.desc}</div>
+                  <span style={{background:'#f1f5f9',color:'#64748b',borderRadius:999,padding:'2px 8px',fontSize:11,fontWeight:600}}>{r.type}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Attempt history */}
+          <div className="a3" style={{background:'white',borderRadius:16,border:'1px solid #f1f5f9',padding:'18px 20px',marginTop:16}}>
+            <h3 style={{fontWeight:800,color:'#0f172a',fontSize:14,margin:'0 0 14px'}}>Attempt History</h3>
+            {[{n:2,score:60,date:'Today, 2:34 PM',passed:false},{n:1,score:40,date:'Yesterday, 10:12 AM',passed:false}].map(a=>(
+              <div key={a.n} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:a.n>1?'1px solid #f8fafc':'none'}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:600,color:'#374151'}}>Attempt #{a.n}</div>
+                  <div style={{fontSize:11,color:'#94a3b8'}}>{a.date}</div>
+                </div>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                  <span style={{fontWeight:800,color:a.score>=80?'#10b981':'#f59e0b',fontSize:16}}>{a.score}%</span>
+                  <StatusBadge status={a.passed?'Passed':'Failed'} size="sm"/>
+                </div>
+              </div>
+            ))}
+            <button onClick={()=>setScreen('upload')} style={{width:'100%',marginTop:16,padding:'12px',borderRadius:10,border:'none',background:'linear-gradient(135deg,#3b82f6,#06b6d4)',color:'white',fontSize:14,fontWeight:700,cursor:'pointer'}}>
+              Start New Attempt →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── UPLOAD PAGE ────────────────────────────────────────────────────── */
+const UploadPage = ({ setScreen }) => {
+  const [dragging, setDragging] = useState(false);
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const handleDrop = (e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if(f) { setFile(f); startUpload(); }};
+  const startUpload = () => {
+    setUploading(true);
+    let p = 0;
+    const iv = setInterval(()=>{ p+=Math.random()*15; if(p>=100){ clearInterval(iv); setProgress(100); setTimeout(()=>setScreen('processing'),600); } else setProgress(Math.min(p,99)); }, 200);
+  };
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'#f8fafc',padding:'40px 24px'}}>
+      <div style={{maxWidth:720,margin:'0 auto'}}>
+        <button onClick={()=>setScreen('module')} style={{background:'none',border:'none',color:'#64748b',cursor:'pointer',fontSize:14,fontWeight:500,marginBottom:24,display:'flex',alignItems:'center',gap:6}}>← Back to Module</button>
+        <div className="a1" style={{marginBottom:32}}>
+          <h1 style={{fontSize:28,fontWeight:900,color:'#0f172a',letterSpacing:'-0.5px',margin:'0 0 8px'}}>Submit Your CPR Assessment</h1>
+          <p style={{color:'#64748b',fontSize:15,margin:0}}>Upload a video of you performing CPR. The AI will score each criterion frame-by-frame.</p>
+        </div>
+
+        {/* Tips */}
+        <div className="a2" style={{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:14,padding:'16px 20px',marginBottom:24,display:'flex',gap:12}}>
+          <span style={{fontSize:20}}>💡</span>
+          <div>
+            <div style={{fontWeight:700,color:'#1e40af',fontSize:14,marginBottom:4}}>Recording tips for best results</div>
+            <div style={{color:'#3b82f6',fontSize:13,lineHeight:1.6}}>Film from the side at a 45° angle · Ensure good lighting · Full body visible · 30 complete compressions · Keep camera steady</div>
+          </div>
+        </div>
+
+        {/* Upload Zone */}
+        <div className="a3 upload-zone" style={{padding:'52px 24px',textAlign:'center',borderRadius:20,marginBottom:24,background:dragging?'#eff6ff':'white',borderColor:dragging?'#3b82f6':'#e2e8f0'}}
+          onDragOver={e=>{e.preventDefault();setDragging(true);}}
+          onDragLeave={()=>setDragging(false)}
+          onDrop={handleDrop}>
+          {uploading ? (
+            <div>
+              <div style={{width:64,height:64,borderRadius:'50%',background:'#eff6ff',margin:'0 auto 16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>📤</div>
+              <div style={{fontWeight:700,color:'#0f172a',fontSize:18,marginBottom:8}}>Uploading via Butterbase...</div>
+              <div style={{background:'#f1f5f9',borderRadius:999,height:8,margin:'0 auto',maxWidth:320,overflow:'hidden'}}>
+                <div style={{width:`${progress}%`,height:'100%',background:'linear-gradient(90deg,#3b82f6,#06b6d4)',borderRadius:999,transition:'width 0.2s ease'}}/>
+              </div>
+              <div style={{color:'#3b82f6',fontSize:14,fontWeight:600,marginTop:10}}>{Math.round(progress)}% · {file?.name||'cpr_assessment.mp4'}</div>
+            </div>
+          ) : file ? (
+            <div>
+              <div style={{width:64,height:64,borderRadius:'50%',background:'#dcfce7',margin:'0 auto 16px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>✅</div>
+              <div style={{fontWeight:700,color:'#0f172a',fontSize:18,marginBottom:8}}>{file.name}</div>
+              <div style={{color:'#64748b',fontSize:14}}>{(file.size/1024/1024).toFixed(1)} MB · Ready to upload</div>
+            </div>
+          ) : (
+            <div>
+              <div style={{width:72,height:72,borderRadius:20,background:'#f1f5f9',margin:'0 auto 20px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <Ico.Upload s={32} c="#94a3b8"/>
+              </div>
+              <div style={{fontWeight:800,color:'#0f172a',fontSize:18,marginBottom:8}}>Drop your video here</div>
+              <div style={{color:'#64748b',fontSize:14,marginBottom:20}}>or click to browse · MP4, MOV, WebM · Max 500MB</div>
+              <label style={{cursor:'pointer'}}>
+                <input type="file" accept="video/*" style={{display:'none'}} onChange={e=>{if(e.target.files[0]){setFile(e.target.files[0]);startUpload();}}}/>
+                <span style={{background:'#3b82f6',color:'white',borderRadius:10,padding:'10px 24px',fontSize:14,fontWeight:600}}>Select Video File</span>
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* OR Record */}
+        <div className="a4" style={{textAlign:'center',marginBottom:24}}>
+          <div style={{position:'relative',display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
+            <div style={{flex:1,height:1,background:'#e2e8f0'}}/>
+            <span style={{color:'#94a3b8',fontSize:13,fontWeight:500}}>or</span>
+            <div style={{flex:1,height:1,background:'#e2e8f0'}}/>
+          </div>
+          <button onClick={startUpload} style={{background:'white',border:'1px solid #e2e8f0',color:'#374151',borderRadius:12,padding:'14px 28px',fontSize:15,fontWeight:600,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:10,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}}>
+            <Ico.Video s={18} c="#3b82f6"/>Record Video Now
+          </button>
+          <p style={{color:'#94a3b8',fontSize:12,marginTop:8}}>Uses your device camera · No additional software needed</p>
+        </div>
+
+        {/* Requirements */}
+        <div className="a5" style={{background:'white',borderRadius:14,padding:'18px 20px',border:'1px solid #f1f5f9'}}>
+          <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:12}}>Verification requirements</div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+            {['Minimum 30 compressions','Clear side angle view','Video under 10 minutes','Patient/manikin visible','Hands clearly visible','Good lighting required'].map(r=>(
+              <div key={r} style={{display:'flex',gap:8,alignItems:'center',fontSize:13,color:'#64748b'}}>
+                <div style={{width:16,height:16,borderRadius:'50%',background:'#dcfce7',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <Ico.Check s={10} c="#15803d"/>
+                </div>
+                {r}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── PROCESSING PAGE ────────────────────────────────────────────────── */
+const ProcessingPage = ({ setScreen }) => {
+  const [step, setStep] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const steps = [
+    { icon:'☁️', label:'Uploading to secure storage', detail:'Butterbase S3-compatible object store', duration:2000 },
+    { icon:'🎬', label:'Extracting video frames', detail:'Sampling at 10fps for analysis', duration:2500 },
+    { icon:'🤖', label:'Running Claude Vision analysis', detail:'Cumulus Labs GPU · Cold start 12.5s', duration:4000 },
+    { icon:'📐', label:'Scoring rubric criteria', detail:'5 criteria · 30-compression cycle', duration:2500 },
+    { icon:'📊', label:'Generating timestamped report', detail:'Identifying failure moments', duration:1500 },
+  ];
+  useEffect(()=>{
+    let total = 0;
+    const timers = steps.map((s,i)=>{
+      total += s.duration;
+      return setTimeout(()=>setStep(i+1), total);
+    });
+    const done = setTimeout(()=>setScreen('feedback'), total+600);
+    const tick = setInterval(()=>setElapsed(e=>e+1), 1000);
+    return ()=>{ timers.forEach(clearTimeout); clearTimeout(done); clearInterval(tick); };
+  }, []);
+  const totalMs = steps.reduce((a,s)=>a+s.duration,0);
+  const progress = Math.min(step/steps.length*100, 100);
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'linear-gradient(135deg,#f8fafc,#eff6ff)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div style={{width:'100%',maxWidth:520,textAlign:'center'}}>
+        {/* AI Brain animation */}
+        <div style={{position:'relative',width:120,height:120,margin:'0 auto 32px'}}>
+          <div className="pulse-anim" style={{position:'absolute',inset:0,borderRadius:'50%',background:'rgba(59,130,246,0.1)',border:'2px solid rgba(59,130,246,0.2)'}}/>
+          <div style={{position:'absolute',inset:8,borderRadius:'50%',background:'rgba(59,130,246,0.08)',border:'2px solid rgba(59,130,246,0.15)'}}/>
+          <div style={{position:'absolute',inset:0,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <div style={{fontSize:42}}>🧠</div>
+          </div>
+          {/* Orbiting dots */}
+          {[0,72,144,216,288].map((deg,i)=>(
+            <div key={i} style={{position:'absolute',top:'50%',left:'50%',width:8,height:8,borderRadius:'50%',background:['#3b82f6','#06b6d4','#8b5cf6','#10b981','#f59e0b'][i],transform:`rotate(${deg}deg) translateX(52px) translateY(-50%)`,transformOrigin:'0 50%',animation:`spin ${2+i*0.3}s linear infinite`}}/>
+          ))}
+        </div>
+
+        <h2 style={{fontSize:26,fontWeight:900,color:'#0f172a',letterSpacing:'-0.5px',margin:'0 0 10px'}}>Analyzing Your Technique</h2>
+        <p style={{color:'#64748b',fontSize:15,margin:'0 0 32px'}}>Claude Vision is scoring each criterion frame-by-frame on Cumulus Labs GPU infrastructure</p>
+
+        {/* Steps */}
+        <div style={{background:'white',borderRadius:20,padding:'24px',border:'1px solid #f1f5f9',marginBottom:24,textAlign:'left',boxShadow:'0 4px 24px rgba(0,0,0,0.06)'}}>
+          {steps.map((s,i)=>{
+            const state = i<step?'done':i===step?'active':'pending';
+            return (
+              <div key={i} className={`processing-step ${state}`} style={{display:'flex',gap:14,alignItems:'center',padding:'10px 0',borderBottom:i<4?'1px solid #f8fafc':'none'}}>
+                <div style={{width:36,height:36,borderRadius:10,background:state==='done'?'#dcfce7':state==='active'?'#eff6ff':'#f8fafc',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,flexShrink:0,transition:'background 0.3s'}}>
+                  {state==='done'?<Ico.Check s={16} c="#10b981"/>:state==='active'?<div className="spin" style={{width:16,height:16,border:'2px solid #bfdbfe',borderTopColor:'#3b82f6',borderRadius:'50%'}}/>:<span>{s.icon}</span>}
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,color:state==='pending'?'#94a3b8':'#0f172a',fontSize:14,transition:'color 0.3s'}}>{s.label}</div>
+                  <div style={{color:'#94a3b8',fontSize:12}}>{s.detail}</div>
+                </div>
+                {state==='done' && <span style={{color:'#10b981',fontSize:12,fontWeight:600}}>Done</span>}
+                {state==='active' && <span style={{color:'#3b82f6',fontSize:12,fontWeight:600}}>Running...</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Progress bar */}
+        <div style={{background:'#f1f5f9',borderRadius:999,height:8,overflow:'hidden',marginBottom:12}}>
+          <div style={{width:`${progress}%`,height:'100%',background:'linear-gradient(90deg,#3b82f6,#06b6d4)',borderRadius:999,transition:'width 0.5s ease'}}/>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between'}}>
+          <span style={{color:'#64748b',fontSize:13}}>{Math.round(progress)}% complete</span>
+          <span style={{color:'#94a3b8',fontSize:13}}>{elapsed}s elapsed</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── FEEDBACK PAGE ──────────────────────────────────────────────────── */
+const FeedbackPage = ({ setScreen }) => {
+  const r = FEEDBACK_RESULT;
+  const [expanded, setExpanded] = useState(null);
+  const statusConfig = {
+    'pass': { bg:'#dcfce7', border:'#86efac', icon:<Ico.CheckCircle s={20} c="#10b981"/>, label:'Pass', labelBg:'#dcfce7', labelTx:'#15803d' },
+    'partial': { bg:'#fef3c7', border:'#fde68a', icon:<Ico.AlertCircle s={20} c="#f59e0b"/>, label:'Partial', labelBg:'#fef3c7', labelTx:'#92400e' },
+    'fail': { bg:'#fee2e2', border:'#fca5a5', icon:<Ico.XCircle s={20} c="#ef4444"/>, label:'Fail', labelBg:'#fee2e2', labelTx:'#991b1b' },
+  };
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'#f8fafc'}}>
+      {/* Result Banner */}
+      <div style={{background:'linear-gradient(135deg,#7f1d1d,#991b1b)',padding:'28px 24px'}}>
+        <div style={{maxWidth:900,margin:'0 auto',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:16}}>
+          <div style={{display:'flex',gap:16,alignItems:'center'}}>
+            <div style={{width:56,height:56,borderRadius:16,background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>⚠️</div>
+            <div>
+              <div style={{color:'#fca5a5',fontSize:12,fontWeight:700,letterSpacing:'1.5px',marginBottom:4}}>ATTEMPT #{r.attemptNumber} · ADULT CPR</div>
+              <h1 style={{color:'white',fontSize:26,fontWeight:900,margin:'0 0 4px',letterSpacing:'-0.5px'}}>Retry Required</h1>
+              <p style={{color:'#fca5a5',fontSize:14,margin:0}}>{r.passedCriteria} of {r.totalCriteria} criteria passed · {r.totalCriteria - r.passedCriteria} need improvement</p>
+            </div>
+          </div>
+          <div style={{display:'flex',gap:14,alignItems:'center'}}>
+            <ScoreRing score={r.score} size={100}/>
+            <div style={{color:'white'}}>
+              <div style={{fontSize:13,fontWeight:600,color:'#fca5a5',marginBottom:4}}>OVERALL SCORE</div>
+              <div style={{fontSize:13,color:'#fecaca'}}>Need 100% to pass</div>
+              <div style={{fontSize:13,color:'#fecaca'}}>All 5 criteria required</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{maxWidth:900,margin:'0 auto',padding:'28px 24px'}}>
+        {/* Quick action bar */}
+        <div className="a1" style={{display:'flex',gap:12,marginBottom:24,flexWrap:'wrap'}}>
+          <button onClick={()=>setScreen('module')} style={{background:'white',border:'1px solid #e2e8f0',color:'#374151',borderRadius:10,padding:'10px 18px',fontSize:14,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:8}}>
+            <Ico.Play s={14} c="#3b82f6"/>Watch Reference at {r.referenceTimestamp}
+          </button>
+          <button onClick={()=>setScreen('upload')} style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:10,padding:'10px 22px',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:8}}>
+            <Ico.Refresh s={14} c="white"/>Try Again
+          </button>
+          <div style={{flex:1}}/>
+          <button style={{background:'white',border:'1px solid #e2e8f0',color:'#64748b',borderRadius:10,padding:'10px 16px',fontSize:13,cursor:'pointer'}}>
+            <Ico.Download s={14} c="#94a3b8"/> Export Report
+          </button>
+        </div>
+
+        {/* Summary chips */}
+        <div className="a2" style={{display:'flex',gap:10,marginBottom:24,flexWrap:'wrap'}}>
+          {r.criteriaResults.map(c=>(
+            <div key={c.id} style={{display:'flex',gap:6,alignItems:'center',background:statusConfig[c.status].bg,border:`1px solid ${statusConfig[c.status].border}`,borderRadius:999,padding:'5px 12px',fontSize:13}}>
+              {statusConfig[c.status].icon}
+              <span style={{fontWeight:600,color:'#0f172a'}}>{c.name}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Timeline */}
+        <div className="a2" style={{background:'white',borderRadius:16,padding:'20px',border:'1px solid #f1f5f9',marginBottom:20}}>
+          <div style={{fontWeight:800,color:'#0f172a',fontSize:14,marginBottom:12}}>Failure timeline</div>
+          <div style={{position:'relative',height:48}}>
+            {/* Timeline bar */}
+            <div style={{position:'absolute',top:20,left:0,right:0,height:4,background:'#f1f5f9',borderRadius:999}}/>
+            <div style={{position:'absolute',top:20,left:0,width:'33%',height:4,background:'linear-gradient(90deg,#10b981,#34d399)',borderRadius:999}}/>
+            {/* Failure segments */}
+            {[{left:'13%',width:'8%',color:'#ef4444'},{left:'60%',width:'10%',color:'#f59e0b'},{left:'50%',width:'5%',color:'#f59e0b'},{left:'66%',width:'33%',color:'#ef4444'}].map((f,i)=>(
+              <div key={i} style={{position:'absolute',top:20,left:f.left,width:f.width,height:4,background:f.color,borderRadius:999}}/>
+            ))}
+            {/* Timestamps */}
+            {[{left:'13%',label:'0:04'},{left:'50%',label:'0:12'},{left:'60%',label:'0:18'},{left:'66%',label:'0:20'}].map((t,i)=>(
+              <div key={i} style={{position:'absolute',top:28,left:t.left,transform:'translateX(-50%)',fontSize:10,color:'#94a3b8',fontWeight:500,whiteSpace:'nowrap'}}>{t.label}</div>
+            ))}
+            {/* Labels */}
+            <div style={{position:'absolute',top:0,left:'2%',fontSize:10,color:'#94a3b8',fontWeight:500}}>0:00</div>
+            <div style={{position:'absolute',top:0,right:0,fontSize:10,color:'#94a3b8',fontWeight:500}}>0:30</div>
+          </div>
+          <div style={{display:'flex',gap:8,marginTop:8,flexWrap:'wrap'}}>
+            <span style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:11,color:'#64748b'}}><span style={{width:10,height:4,background:'#10b981',borderRadius:999,display:'inline-block'}}/>Passing</span>
+            <span style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:11,color:'#64748b'}}><span style={{width:10,height:4,background:'#f59e0b',borderRadius:999,display:'inline-block'}}/>Partial</span>
+            <span style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:11,color:'#64748b'}}><span style={{width:10,height:4,background:'#ef4444',borderRadius:999,display:'inline-block'}}/>Failing</span>
+          </div>
+        </div>
+
+        {/* Criteria Cards */}
+        <div className="a3" style={{display:'flex',flexDirection:'column',gap:14}}>
+          {r.criteriaResults.map((c,i)=>{
+            const sc = statusConfig[c.status];
+            const isExp = expanded===c.id;
+            return (
+              <div key={c.id} className={`criterion-card ${c.status}`} style={{background:'white',borderRadius:16,overflow:'hidden',border:'1px solid #f1f5f9',boxShadow:isExp?'0 4px 20px rgba(0,0,0,0.06)':'none'}}>
+                <div style={{padding:'18px 20px',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}
+                  onClick={()=>setExpanded(isExp?null:c.id)}>
+                  <div style={{display:'flex',gap:14,alignItems:'center'}}>
+                    {sc.icon}
+                    <div>
+                      <div style={{fontWeight:800,color:'#0f172a',fontSize:15}}>{c.name}</div>
+                      <div style={{color:'#94a3b8',fontSize:12,marginTop:2}}>{c.weight}% weight · {c.type==='scored'?`${c.score}/100`:c.status.toUpperCase()}</div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                    {c.timestamps.map((t,ti)=>(
+                      <span key={ti} className={`timestamp-pill ${c.status==='fail'?'fail-pill':''}`}>⏱ {t.start}–{t.end}</span>
+                    ))}
+                    <span style={{background:sc.labelBg,color:sc.labelTx,borderRadius:999,padding:'4px 12px',fontSize:12,fontWeight:700}}>{sc.label}</span>
+                    <div style={{transform:isExp?'rotate(180deg)':'rotate(0deg)',transition:'transform 0.2s'}}>▾</div>
+                  </div>
+                </div>
+                {isExp && (
+                  <div style={{padding:'0 20px 18px',borderTop:'1px solid #f8fafc'}}>
+                    <p style={{color:'#374151',fontSize:14,lineHeight:1.7,margin:'12px 0'}}>{c.feedback}</p>
+                    {c.timestamps.length > 0 && (
+                      <div style={{background:'#fef2f2',borderRadius:10,padding:'12px 14px',marginBottom:12}}>
+                        <div style={{fontWeight:700,color:'#991b1b',fontSize:13,marginBottom:8}}>Failure timestamps</div>
+                        {c.timestamps.map((t,ti)=>(
+                          <div key={ti} style={{display:'flex',gap:10,alignItems:'center',marginBottom:ti<c.timestamps.length-1?6:0}}>
+                            <span style={{background:'#fee2e2',color:'#991b1b',borderRadius:999,padding:'2px 10px',fontSize:12,fontWeight:700,whiteSpace:'nowrap'}}>⏱ {t.start} – {t.end}</span>
+                            <span style={{color:'#dc2626',fontSize:13}}>{t.note}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={()=>setScreen('module')} style={{background:'none',border:'1px solid #bfdbfe',color:'#3b82f6',borderRadius:8,padding:'7px 14px',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>
+                      <Ico.Play s={12} c="#3b82f6"/>Watch reference at {r.referenceTimestamp}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom actions */}
+        <div className="a4" style={{display:'flex',gap:14,marginTop:28,flexWrap:'wrap',justifyContent:'center'}}>
+          <button onClick={()=>setScreen('module')} style={{background:'white',border:'1px solid #e2e8f0',color:'#374151',borderRadius:12,padding:'14px 28px',fontSize:15,fontWeight:700,cursor:'pointer'}}>
+            ▷ Watch Reference Video
+          </button>
+          <button onClick={()=>setScreen('upload')} style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:12,padding:'14px 32px',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 16px rgba(59,130,246,0.35)'}}>
+            <Ico.Refresh s={16} c="white"/> Retry Assessment
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── INSTRUCTOR DASHBOARD ───────────────────────────────────────────── */
+const InstructorDashboard = ({ setScreen }) => {
+  const [search, setSearch] = useState('');
+  const filtered = LEARNERS.filter(l=>l.name.toLowerCase().includes(search.toLowerCase())||l.role.toLowerCase().includes(search.toLowerCase()));
+  const stats = [
+    { label:'Total Learners', value:'48', sub:'+6 this week', icon:'👥', color:'#3b82f6', bg:'#eff6ff' },
+    { label:'Overall Pass Rate', value:'34%', sub:'vs 31% last month', icon:'📈', color:'#10b981', bg:'#dcfce7' },
+    { label:'Avg Attempts', value:'2.8', sub:'Per module completion', icon:'🔄', color:'#f59e0b', bg:'#fef3c7' },
+    { label:'Pending Reviews', value:'7', sub:'Flagged for manual check', icon:'🔍', color:'#8b5cf6', bg:'#f5f3ff' },
+  ];
+  const modStats = [
+    { name:'Adult CPR', passRate:72, attempts:94, color:'#ef4444' },
+    { name:'AED Use', passRate:81, attempts:45, color:'#f59e0b' },
+    { name:'Heimlich', passRate:65, attempts:22, color:'#8b5cf6' },
+  ];
+  const statusBg = { 'Passed':'#dcfce7', 'Failed':'#fee2e2', 'In Progress':'#dbeafe', 'Locked':'#f1f5f9' };
+  const statusTx = { 'Passed':'#15803d', 'Failed':'#991b1b', 'In Progress':'#1d4ed8', 'Locked':'#94a3b8' };
+  return (
+    <div style={{minHeight:'calc(100vh - 64px)',background:'#f8fafc',padding:'28px 24px'}}>
+      <div style={{maxWidth:1280,margin:'0 auto'}}>
+        {/* Header */}
+        <div className="a1" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:28,flexWrap:'wrap',gap:12}}>
+          <div>
+            <h1 style={{fontSize:26,fontWeight:900,color:'#0f172a',margin:'0 0 4px',letterSpacing:'-0.5px'}}>Instructor Dashboard</h1>
+            <p style={{color:'#64748b',fontSize:14,margin:0}}>St. Mary's Medical Center · Spring 2025 Cohort</p>
+          </div>
+          <div style={{display:'flex',gap:10}}>
+            <button style={{background:'white',border:'1px solid #e2e8f0',color:'#374151',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>
+              <Ico.Download s={14} c="#64748b"/>Export CSV
+            </button>
+            <button style={{background:'linear-gradient(135deg,#3b82f6,#06b6d4)',border:'none',color:'white',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>
+              <Ico.Plus s={14} c="white"/>Add Learners
+            </button>
+          </div>
+        </div>
+
+        {/* Stat Cards */}
+        <div className="a2" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:16,marginBottom:24}}>
+          {stats.map((s,i)=>(
+            <div key={i} className="hover-lift" style={{background:'white',borderRadius:16,padding:'20px 22px',border:'1px solid #f1f5f9'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:14}}>
+                <div style={{width:44,height:44,borderRadius:12,background:s.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>{s.icon}</div>
+                <span style={{color:'#94a3b8',fontSize:11,fontWeight:600}}>{s.sub}</span>
+              </div>
+              <div style={{fontSize:30,fontWeight:900,color:s.color,letterSpacing:'-1px',lineHeight:1}}>{s.value}</div>
+              <div style={{color:'#64748b',fontSize:13,marginTop:6,fontWeight:500}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 340px',gap:20,marginBottom:20,alignItems:'start'}}>
+          {/* Module Performance */}
+          <div className="a3" style={{background:'white',borderRadius:16,padding:'22px',border:'1px solid #f1f5f9'}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}>
+              <h3 style={{fontWeight:800,color:'#0f172a',fontSize:15,margin:0}}>Module Performance</h3>
+              <span style={{color:'#94a3b8',fontSize:12}}>Pass rate by module</span>
+            </div>
+            {modStats.map((m,i)=>(
+              <div key={i} style={{marginBottom:18}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                  <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                    <div style={{width:10,height:10,borderRadius:3,background:m.color}}/>
+                    <span style={{fontWeight:600,color:'#0f172a',fontSize:14}}>{m.name}</span>
+                    <span style={{color:'#94a3b8',fontSize:12}}>· {m.attempts} attempts</span>
+                  </div>
+                  <span style={{fontWeight:800,color:m.color,fontSize:16}}>{m.passRate}%</span>
+                </div>
+                <div style={{background:'#f8fafc',borderRadius:999,height:10,overflow:'hidden'}}>
+                  <div style={{width:`${m.passRate}%`,height:'100%',background:`linear-gradient(90deg,${m.color}88,${m.color})`,borderRadius:999,transition:'width 1s ease'}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Criterion Heatmap */}
+          <div className="a3" style={{background:'white',borderRadius:16,padding:'22px',border:'1px solid #f1f5f9'}}>
+            <h3 style={{fontWeight:800,color:'#0f172a',fontSize:15,margin:'0 0 16px'}}>Hardest Criteria</h3>
+            {[
+              { name:'Rhythm Consistency', fail:58, mod:'CPR' },
+              { name:'Compression Rate', fail:44, mod:'CPR' },
+              { name:'Chest Recoil', fail:31, mod:'CPR' },
+              { name:'Pad Placement', fail:29, mod:'AED' },
+              { name:'Clear Call', fail:22, mod:'AED' },
+            ].map((c,i)=>(
+              <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12,padding:'8px 12px',background:'#fafafa',borderRadius:10}}>
+                <div>
+                  <div style={{fontWeight:600,color:'#0f172a',fontSize:13}}>{c.name}</div>
+                  <div style={{color:'#94a3b8',fontSize:11}}>{c.mod} module</div>
+                </div>
+                <span style={{background:c.fail>50?'#fee2e2':c.fail>30?'#fef3c7':'#f1f5f9',color:c.fail>50?'#ef4444':c.fail>30?'#d97706':'#64748b',borderRadius:999,padding:'4px 10px',fontSize:12,fontWeight:700}}>{c.fail}% fail rate</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Learner Table */}
+        <div className="a4" style={{background:'white',borderRadius:16,border:'1px solid #f1f5f9',overflow:'hidden'}}>
+          <div style={{padding:'18px 22px',borderBottom:'1px solid #f8fafc',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
+            <h3 style={{fontWeight:800,color:'#0f172a',fontSize:15,margin:0}}>Learner Progress</h3>
+            <div style={{display:'flex',gap:10,alignItems:'center'}}>
+              <div style={{position:'relative'}}>
+                <div style={{position:'absolute',top:'50%',left:10,transform:'translateY(-50%)'}}>
+                  <Ico.Search s={16} c="#94a3b8"/>
+                </div>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search learners..." style={{paddingLeft:34,padding:'8px 12px 8px 34px',borderRadius:8,border:'1px solid #e2e8f0',fontSize:13,outline:'none',width:200}}/>
+              </div>
+            </div>
+          </div>
+          <div style={{overflowX:'auto'}}>
+            <table style={{width:'100%',borderCollapse:'collapse'}}>
+              <thead>
+                <tr style={{background:'#f8fafc'}}>
+                  {['Learner','Role','CPR','AED','Heimlich','Avg Score','Attempts','Last Active'].map(h=>(
+                    <th key={h} style={{padding:'10px 18px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((l,i)=>(
+                  <tr key={i} style={{borderTop:'1px solid #f8fafc',transition:'background 0.15s',cursor:'pointer'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='#f8fafc'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <td style={{padding:'14px 18px'}}>
+                      <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                        <div style={{width:34,height:34,borderRadius:'50%',background:'linear-gradient(135deg,#3b82f6,#8b5cf6)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:12,fontWeight:700,flexShrink:0}}>{l.avatar}</div>
+                        <div>
+                          <div style={{fontWeight:700,color:'#0f172a',fontSize:14}}>{l.name}</div>
+                          {l.certified && <span style={{fontSize:10,color:'#10b981',fontWeight:700}}>✓ CERTIFIED</span>}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{padding:'14px 18px',color:'#64748b',fontSize:13}}>{l.role}</td>
+                    {[l.cpr,l.aed,l.heimlich].map((s,si)=>(
+                      <td key={si} style={{padding:'14px 18px'}}>
+                        <span style={{background:statusBg[s],color:statusTx[s],borderRadius:999,padding:'3px 10px',fontSize:11,fontWeight:600,whiteSpace:'nowrap'}}>{s}</span>
+                      </td>
+                    ))}
+                    <td style={{padding:'14px 18px'}}>
+                      <span style={{fontWeight:800,fontSize:15,color:l.avgScore>=80?'#10b981':l.avgScore>=60?'#f59e0b':'#ef4444'}}>{l.avgScore}%</span>
+                    </td>
+                    <td style={{padding:'14px 18px',color:'#64748b',fontSize:13,textAlign:'center'}}>{l.attempts}</td>
+                    <td style={{padding:'14px 18px',color:'#94a3b8',fontSize:12}}>{l.lastActive}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{padding:'14px 22px',borderTop:'1px solid #f8fafc',color:'#94a3b8',fontSize:12,display:'flex',justifyContent:'space-between'}}>
+            <span>Showing {filtered.length} of {LEARNERS.length} learners</span>
+            <span>St. Mary's · Spring 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── APP ────────────────────────────────────────────────────────────── */
+const App = () => {
+  const [screen, setScreen] = useState('landing');
+  const [userType, setUserType] = useState('');
+  const pages = { landing:<LandingPage setScreen={setScreen}/>, auth:<AuthPage setScreen={setScreen} setUserType={setUserType}/>, dashboard:<LearnerDashboard setScreen={setScreen}/>, module:<ModulePage setScreen={setScreen}/>, upload:<UploadPage setScreen={setScreen}/>, processing:<ProcessingPage setScreen={setScreen}/>, feedback:<FeedbackPage setScreen={setScreen}/>, instructor:<InstructorDashboard setScreen={setScreen}/> };
+  return (
+    <div>
+      <DemoNav screen={screen} setScreen={setScreen}/>
+      <Navbar screen={screen} setScreen={setScreen} userType={userType}/>
+      <div className="fade-in" key={screen}>
+        {pages[screen] || pages.landing}
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
