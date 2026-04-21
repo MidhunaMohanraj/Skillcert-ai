@@ -12,7 +12,7 @@ def extract_frames(video_path, every_n_seconds=2):
     count = 0
     while cap.isOpened():
         ret, frame = cap.read()
-        if not ret:
+        if not ret:   
             break
         if count % int(fps * every_n_seconds) == 0:
             _, buffer = cv2.imencode(".jpg", frame)
